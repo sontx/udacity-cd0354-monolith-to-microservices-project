@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: udagram-configmap
+data:
+  postgres_host: database-1.cwejzy8ekrmu.us-east-1.rds.amazonaws.com
+  postgres_db: postgres
+  aws_bucket: udacity-030393
+  aws_region: us-east-1
+  aws_profile: default
+  url: http://localhost:8100

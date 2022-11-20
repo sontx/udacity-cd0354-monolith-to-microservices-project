@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend-user
+  template:
+    metadata:
+      labels:
+        app: backend-user
+    spec:
+      volumes:
+        - name: aws-config
+          secret:
+            secretName: udagram-aws-secret
+      containers:
+      - name: backend-user
+        image: sontx/udagram-api-user:v2
+        resources:
+          limits:
+            memory: "250Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: udargram-secret
+                key: postgres_username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: udargram-secret
+                key: postgres_password
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: udargram-secret
+                key: jwt_secret
+          - name: POSTGRES_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: udagram-configmap
+                key: postgres_host
+          - name: AWS_BUCKET
+            valueFrom:
+              configMapKeyRef:
+                name: udagram-configmap
+                key: aws_bucket
+          - name: AWS_REGION
+            valueFrom:
+              configMapKeyRef:
+                name: udagram-configmap
+                key: aws_region
+          - name: AWS_PROFILE
+            valueFrom:
+              configMapKeyRef:
+                name: udagram-configmap
+                key: aws_profile
+          - name: URL
+            valueFrom:
+              configMapKeyRef:
+                name: udagram-configmap
+                key: url
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-user
+spec:
+  selector:
+    app: backend-user
+  ports:
+  - port: 8080
+    targetPort: 8080
